@@ -1,6 +1,7 @@
 from telebot import types
 import re
 import telebot
+from User import User
 
 bot = telebot.TeleBot('7897016753:AAF8OAJ8jXWRpDyCOrHM344rW8zUEXTX-_c')
 
@@ -39,12 +40,13 @@ def get_reg_number(message):
         return
 
 def get_number(message):
-    global number
+    global phone_number
     if bool(re.search(r'8\d{10}', message.text)):
-        number = message.text
+        phone_number = message.text
     else:
         bot.send_message(message.from_user.id, 'Номер телефона набран неправильно. Повторите, пожалуйста, ввод')
         bot.register_next_step_handler_by_chat_id(message.from_user.id, get_number)
+        return 
 
     bot.send_message(message.from_user.id, 'Отлично, спасибо!\nУточните, пожалуйста, свой полный адрес.')
     bot.register_next_step_handler_by_chat_id(message.from_user.id, get_address)
@@ -53,7 +55,10 @@ def get_number(message):
 def get_address(message):
     global address
     address = message.text
-    bot.send_message(message.from_user.id, 'Благодарим за ответы! Вам присвоен персональный номер договора: ' + generate_reg_number)
+    user = User(phone_number, address)
+    bot.send_message(message.from_user.id, 'Благодарим за ответы! Вам присвоен персональный номер договора: ' + user.get_reg_number())
+    #bot.register_next_step_handler_by_chat_id(message.from_user.id, get_address(User))
+
 
 
 
